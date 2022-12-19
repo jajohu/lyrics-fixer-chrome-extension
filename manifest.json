@@ -1,0 +1,10 @@
+{
+    "manifest_version": 3,
+    "name": "Lyrics Fixer",
+    "description": "Basic utility that helps with the formatting of song lyrics",
+    "version": "1.0",
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": "lyrics_fixer_logo.png"
+    }
+  }
