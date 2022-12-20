@@ -1,6 +1,8 @@
 document.getElementById("lyricsSubmit").addEventListener("click", formatAndShowResultInForm)
 
 const forbiddenLineEndings = [".", ","]
+const allowedOpenBrackets = ["(", "{", "["]
+const allowedClosedBrackets = [")", "}", "]"]
 
 
 function formatAndShowResultInForm() {
@@ -49,12 +51,12 @@ class LyricsFixer {
                     if (index === splitLine.length - 1) {
                         resultLine.push(removeForbiddenLineEndings(toTitleCase(word)))
                     } else {
-                        resultLine.push(toTitleCase(word))
+                        resultLine.push(onlyThreeDots(toTitleCase(word)))
                     }
                 } else if (index === splitLine.length - 1) {
                     resultLine.push(removeForbiddenLineEndings(word))
                 } else {
-                    resultLine.push(word)
+                    resultLine.push(onlyThreeDots(word))
                 }
             }
         }
@@ -64,33 +66,53 @@ class LyricsFixer {
 
 
 function toTitleCase(str) {
-  var result = ""
-  for (var [index, c] of str.split("").entries()) {
-    if (index===0) {
-      result += c.toUpperCase()
-    } else {
-      result += c.toLowerCase()
+    var result = ""
+    var firstCharWasOpenBracket = false
+    for (var [index, c] of str.split("").entries()) {
+        if (index === 0) {
+            if (allowedOpenBrackets.includes(c)) {
+                result += c
+                firstCharWasOpenBracket = true
+            } else {
+                result += c.toUpperCase()
+            }
+        } else if (firstCharWasOpenBracket) {
+            result += c.toUpperCase()
+            firstCharWasOpenBracket = false
+        } else {
+            result += c
+        }
     }
-  }
-  return result
+    return result
 }
 
+
 function removeForbiddenLineEndings(str) {
+    var closedBracket = ""
+    if (allowedClosedBrackets.includes(str[str.length-1])) {
+        closedBracket = str[str.length-1]
+        str = str.slice(0, str.length-1)
+    }
+    return onlyThreeDots(str) + closedBracket
+}
+
+
+function onlyThreeDots(str) {
     var result = []
     var consecutiveDots = 0
     var stillDots = true
     var threeDots = "..."
     for (var c of str.split("").reverse()) {
-      if (c==="."&stillDots) {
-          consecutiveDots++
-      }
-      if (!forbiddenLineEndings.includes(c)) {
-        result.push(c)
-        stillDots = false
-      }
+        if (c === "." & stillDots) {
+            consecutiveDots++
+        }
+        if (!forbiddenLineEndings.includes(c)) {
+            result.push(c)
+            stillDots = false
+        }
     }
-    if (consecutiveDots<2){
-      threeDots = ""
+    if (consecutiveDots < 2) {
+        threeDots = ""
     }
     return result.reverse().join("") + threeDots
-  }
+}
