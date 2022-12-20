@@ -89,9 +89,9 @@ function toTitleCase(str) {
 
 function removeForbiddenLineEndings(str) {
     var closedBracket = ""
-    if (allowedClosedBrackets.includes(str[str.length-1])) {
-        closedBracket = str[str.length-1]
-        str = str.slice(0, str.length-1)
+    if (allowedClosedBrackets.includes(str[str.length - 1])) {
+        closedBracket = str[str.length - 1]
+        str = str.slice(0, str.length - 1)
     }
     return onlyThreeDots(str) + closedBracket
 }
