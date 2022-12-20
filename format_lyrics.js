@@ -1,5 +1,7 @@
 document.getElementById("lyricsSubmit").addEventListener("click", formatAndShowResultInForm)
 
+const forbiddenLineEndings = [".", ","]
+
 
 function formatAndShowResultInForm() {
     var submissionBox = document.getElementById("lyricsTextArea")
@@ -41,10 +43,16 @@ class LyricsFixer {
     #fixLineByWords(line) {
         var splitLine = line.split(" ")
         var resultLine = []
-        for (var word of splitLine) {
+        for (var [index, word] of splitLine.entries()) {
             if (word !== "") {
                 if (resultLine.length === 0) {
-                    resultLine.push(toTitleCase(word))
+                    if (index === splitLine.length - 1) {
+                        resultLine.push(removeForbiddenLineEndings(toTitleCase(word)))
+                    } else {
+                        resultLine.push(toTitleCase(word))
+                    }
+                } else if (index === splitLine.length - 1) {
+                    resultLine.push(removeForbiddenLineEndings(word))
                 } else {
                     resultLine.push(word)
                 }
@@ -56,10 +64,33 @@ class LyricsFixer {
 
 
 function toTitleCase(str) {
-    return str.replace(
-        /\w\S*/g,
-        function (txt) {
-            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-        }
-    )
+  var result = ""
+  for (var [index, c] of str.split("").entries()) {
+    if (index===0) {
+      result += c.toUpperCase()
+    } else {
+      result += c.toLowerCase()
+    }
+  }
+  return result
 }
+
+function removeForbiddenLineEndings(str) {
+    var result = []
+    var consecutiveDots = 0
+    var stillDots = true
+    var threeDots = "..."
+    for (var c of str.split("").reverse()) {
+      if (c==="."&stillDots) {
+          consecutiveDots++
+      }
+      if (!forbiddenLineEndings.includes(c)) {
+        result.push(c)
+        stillDots = false
+      }
+    }
+    if (consecutiveDots<2){
+      threeDots = ""
+    }
+    return result.reverse().join("") + threeDots
+  }
