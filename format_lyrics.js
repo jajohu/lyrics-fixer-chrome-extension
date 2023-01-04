@@ -26,6 +26,7 @@ class LyricsFixer {
     #fixLyricsByLine() {
         var fixedLines = []
         for (var line of this.splitLyrics) {
+            line = line.trim()
             this.#checkForNewlines(line)
             if (this.consecutiveNewLines < 2) {
                 fixedLines.push(this.#fixLineByWords(line))
@@ -35,7 +36,7 @@ class LyricsFixer {
     }
 
     #checkForNewlines(line) {
-        if (line.trim() === "") {
+        if (line === "") {
             this.consecutiveNewLines += 1
         } else {
             this.consecutiveNewLines = 0
@@ -93,11 +94,11 @@ function removeForbiddenLineEndings(str) {
         closedBracket = str[str.length - 1]
         str = str.slice(0, str.length - 1)
     }
-    return onlyThreeDots(str) + closedBracket
+    return onlyThreeDots(str, middleOfLine=false) + closedBracket
 }
 
 
-function onlyThreeDots(str) {
+function onlyThreeDots(str, middleOfLine=true) {
     var result = []
     var consecutiveDots = 0
     var stillDots = true
@@ -106,7 +107,7 @@ function onlyThreeDots(str) {
         if (c === "." & stillDots) {
             consecutiveDots++
         }
-        if (!forbiddenLineEndings.includes(c)) {
+        if (!forbiddenLineEndings.includes(c)||middleOfLine) {
             result.push(c)
             stillDots = false
         }
